@@ -1,9 +1,8 @@
 from fastapi import FastAPI, Depends, status
 from fastapi.responses import JSONResponse
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 
-from app.database import get_db, DBSession
+from app.database import  DBSession
 
 app = FastAPI(title="Epom")
 
