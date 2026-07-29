@@ -7,5 +7,6 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
+    app_env: str
 
 settings = Settings() # type: ignore
