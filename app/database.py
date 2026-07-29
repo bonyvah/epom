@@ -1,9 +1,9 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import DeclarativeBase
-from config import settings
+from typing import Annotated
+from fastapi import Depends
 
 from app.config import settings
-
 
 engine = create_async_engine(settings.database_url,
                             echo=settings.app_env == "dev")
@@ -18,3 +18,5 @@ class Base(DeclarativeBase):
 async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
+
+DBSession = Annotated[AsyncSession, Depends(get_db)]
