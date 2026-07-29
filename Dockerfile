@@ -10,8 +10,8 @@ COPY pyproject.toml .
 RUN pip install .
 
 COPY app/ ./app/
-COPY alembic/ ./alembic/
-COPY alembic.ini .
+# COPY alembic/ ./alembic/
+# COPY alembic.ini .
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
