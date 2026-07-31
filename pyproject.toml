@@ -9,6 +9,7 @@ dependencies = [
     "alembic",
     "pydantic-settings",
     "passlib[bcrypt]",
+    "psycopg2-binary",
 ]
 
 [build-system]
