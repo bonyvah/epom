@@ -9,8 +9,12 @@ dependencies = [
     "alembic",
     "pydantic-settings",
     "passlib[bcrypt]",
+    "psycopg2-binary",
 ]
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]

@@ -7,11 +7,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 COPY pyproject.toml .
-RUN pip install .
+RUN --mount=type=cache,target=/root/.cache/pip pip install --default-timeout=500 --retries=5 .
 
 COPY app/ ./app/
-# COPY alembic/ ./alembic/
-# COPY alembic.ini .
+COPY alembic/ ./alembic/
+COPY alembic.ini .
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
