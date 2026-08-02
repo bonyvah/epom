@@ -10,6 +10,7 @@ dependencies = [
     "pydantic-settings",
     "passlib[bcrypt]",
     "psycopg2-binary",
+    "PyJWT",
 ]
 
 [build-system]
