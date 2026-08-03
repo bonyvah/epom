@@ -22,7 +22,7 @@ def upgrade() -> None:
     op.create_table('users',
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('login', sa.String(length=255), nullable=False),
-    sa.Column('hashed_password', sa.String(length=255), nullable=False),
+    sa.Column('hashed_password', sa.Text(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id'),
@@ -51,7 +51,7 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['uploaded_by'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['uploaded_by'], ['users.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('project_members',
