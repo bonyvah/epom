@@ -1,0 +1,46 @@
+from fastapi import HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import User
+from app.schemas.user import RegisterRequest, LoginRequest, TokenResponse
+from app.utils.auth import hash_password, verify_password, create_access_token
+
+
+async def register(body: RegisterRequest, db: AsyncSession) -> TokenResponse:
+    result = await db.execute(select(User).where(User.login == body.login))
+    if result.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="User with such login already exists",
+        )
+
+    user = User(login=body.login, hashed_password=hash_password(body.password))
+    try:
+        db.add(user)
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Login already taken"
+        )
+
+    await db.refresh(user)
+
+    return TokenResponse(access_token=create_access_token(str(user.id)))
+
+
+async def login(body: LoginRequest, db: AsyncSession) -> TokenResponse:
+    result = await db.execute(
+        select(User).where(User.login == body.login, User.deleted_at.is_(None))
+    )
+    user: User | None = result.scalar_one_or_none()
+
+    if not user or not verify_password(body.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return TokenResponse(access_token=create_access_token(str(user.id)))
