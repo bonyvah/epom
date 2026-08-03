@@ -8,7 +8,7 @@ dependencies = [
     "asyncpg",
     "alembic",
     "pydantic-settings",
-    "passlib[bcrypt]",
+    "argon2-cffi",
     "psycopg2-binary",
     "PyJWT",
 ]
