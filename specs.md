@@ -20,7 +20,7 @@
 | --- | --- | --- |
 | POST | /auth | Register user (login, password, repeat password) |
 | POST | /login | Login → returns JWT |
-| POST | /projects | Create project (auto-assigns owner) |
+| POST | /project | Create project (auto-assigns owner) |
 | GET | /projects | List all accessible projects (full info) |
 | GET | /project/<id>/info | Get project details |
 | PUT | /project/<id>/info | Update project name/description |
