@@ -9,16 +9,9 @@ from app.utils.auth import hash_password, verify_password, create_access_token
 
 
 async def register(body: RegisterRequest, db: AsyncSession) -> TokenResponse:
-    result = await db.execute(select(User).where(User.login == body.login))
-    if result.scalar_one_or_none():
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="User with such login already exists",
-        )
-
     user = User(login=body.login, hashed_password=hash_password(body.password))
+    db.add(user)
     try:
-        db.add(user)
         await db.commit()
     except IntegrityError:
         await db.rollback()
