@@ -2,9 +2,9 @@ from pydantic import BaseModel, Field, model_validator
 
 
 class RegisterRequest(BaseModel):
-    login: str
-    password: str = Field(min_length=8)
-    repeat_password: str
+    login: str = Field(min_length=3, max_length=50)
+    password: str = Field(min_length=8, max_length=128)
+    repeat_password: str = Field(min_length=8, max_length=128)
 
     @model_validator(mode="after")
     def password_match(self):
