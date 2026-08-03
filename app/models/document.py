@@ -21,7 +21,7 @@ class Document(Base):
     )  # After document upload Lambda calculates the size and fills it
     content_type: Mapped[str] = mapped_column(Text, nullable=False)
     uploaded_by: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id"), nullable=False
+        ForeignKey("users.id", ondelete="RESTRICT"), nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
