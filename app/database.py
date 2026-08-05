@@ -5,8 +5,7 @@ from fastapi import Depends
 
 from app.config import settings
 
-engine = create_async_engine(settings.database_url,
-                            echo=settings.app_env == "dev")
+engine = create_async_engine(settings.database_url, echo=settings.app_env == "dev")
 
 AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
@@ -18,5 +17,6 @@ class Base(DeclarativeBase):
 async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
+
 
 DBSession = Annotated[AsyncSession, Depends(get_db)]
