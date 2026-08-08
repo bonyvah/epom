@@ -5,9 +5,7 @@ from uuid import UUID
 from app.schemas.project import ProjectResponse, ProjectCreate, ProjectUpdate, InviteUserRequest
 from app.dependencies import CurrentUser
 from app.database import DBSession
-from app.services import project_service
-
-from app.models import Membership
+from app.services import project as project_service
 
 router = APIRouter(tags=["projects"])
 
