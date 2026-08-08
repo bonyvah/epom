@@ -8,5 +8,8 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
     app_env: str
+    resend_api_key: str
+    sender_email: str
+    app_url:str
 
 settings = Settings() # type: ignore
