@@ -47,7 +47,7 @@ async def create_project(
     )
 
     db.add(project)
-    await db.commit()
+    await db.flush()
     db.add(membership)
     await db.commit()
     await db.refresh(project)
