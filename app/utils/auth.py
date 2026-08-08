@@ -4,6 +4,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHashError
 from fastapi import HTTPException, status
 
+from uuid import UUID
 from datetime import datetime, timezone, timedelta
 from app.config import settings
 
@@ -40,4 +41,22 @@ def decode_access_token(token: str) -> str:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+def create_invite_token(project_id: str, email: str) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(hours=24)
+    payload = {"sub": "invite", "project_id": project_id, "email": email, "exp": expire}
+    return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
+
+def decode_invite_token(token: str) -> str:
+    try:
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+        if payload.get("sub") != "invite":
+            raise InvalidTokenError()
+        return payload["project_id"]
+    except InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired invitation token"
         )
