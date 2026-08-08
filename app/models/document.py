@@ -16,9 +16,7 @@ class Document(Base):
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     s3_key: Mapped[str] = mapped_column(Text, nullable=False)
-    size_bytes: Mapped[int | None] = mapped_column(
-        BigInteger, nullable=True
-    )  # After document upload Lambda calculates the size and fills it
+    size_bytes: Mapped[int | None] = mapped_column(BigInteger, nullable=False)
     content_type: Mapped[str] = mapped_column(Text, nullable=False)
     uploaded_by: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="RESTRICT"), nullable=False
@@ -27,7 +25,8 @@ class Document(Base):
         DateTime(timezone=True), server_default=func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now())
+        DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now()
+    )
     deleted_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
