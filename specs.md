@@ -25,13 +25,13 @@
 | GET | /project/<id\>/info | Get project details |
 | PUT | /project/<id\>/info | Update project name/description |
 | DELETE | /project/<id\> | Delete project + documents (owner only) |
+| POST | /project/<id\>/invite | Grant access to a user (owner only) |
+| POST | /project/<id\>/share?email=<email\> | send a join link with hashed token to an email. |
 | GET | /project/<id\>/documents | List project documents |
 | POST | /project/<id\>/documents | Upload document(s) |
 | GET | /document/<id\> | Download document |
 | PUT | /document/<id\> | Update document |
 | DELETE | /document/<id\> | Delete document |
-| POST | /project/<id\>/invite | Grant access to a user (owner only) |
-| POST | /project/<id\>/share?email=<email\> | send a join link with hashed token to an email. |
 
 ### Scope — Phase 2
 
