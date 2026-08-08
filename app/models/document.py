@@ -16,7 +16,7 @@ class Document(Base):
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     s3_key: Mapped[str] = mapped_column(Text, nullable=False)
-    size_bytes: Mapped[int | None] = mapped_column(BigInteger, nullable=False)
+    size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
     content_type: Mapped[str] = mapped_column(Text, nullable=False)
     uploaded_by: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="RESTRICT"), nullable=False
