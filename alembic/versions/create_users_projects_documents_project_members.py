@@ -44,7 +44,7 @@ def upgrade() -> None:
     sa.Column('project_id', sa.Uuid(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('s3_key', sa.Text(), nullable=False),
-    sa.Column('size_bytes', sa.BigInteger(), nullable=True),
+    sa.Column('size_bytes', sa.BigInteger(), nullable=False),
     sa.Column('content_type', sa.Text(), nullable=False),
     sa.Column('uploaded_by', sa.Uuid(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
