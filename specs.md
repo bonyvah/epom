@@ -32,7 +32,7 @@
 | DELETE | /document/<id> | Delete document |
 | POST | /project/<id>/invite | Grant access to a user (owner only) |
 
-**Optional:** `GET /project/<id>/share?with=<email>` — send a join link with hashed token to an email.
+**Optional:** `POST /project/<id>/share?email=<email>` — send a join link with hashed token to an email.
 
 ### Scope — Phase 2
 

@@ -64,6 +64,32 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('project_id', 'user_id')
     )
 
+    # --- Trigger Function Creation ---
+    op.execute("""
+        CREATE OR REPLACE FUNCTION update_updated_at_column()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            NEW.updated_at = NOW();
+            RETURN NEW;
+        END;
+        $$ language 'plpgsql';
+    """)
+
+    # --- Attach Triggers to Tables ---
+    op.execute("""
+        CREATE TRIGGER update_projects_updated_at
+            BEFORE UPDATE ON projects
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column();
+    """)
+
+    op.execute("""
+        CREATE TRIGGER update_documents_updated_at
+            BEFORE UPDATE ON documents
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column();
+    """)
+
 
 def downgrade() -> None:
     """Downgrade schema."""
@@ -72,3 +98,4 @@ def downgrade() -> None:
     op.drop_table('projects')
     op.drop_table('users')
     op.execute("DROP TYPE IF EXISTS role")
+    op.execute("DROP FUNCTION IF EXISTS update_updated_at_column();")
