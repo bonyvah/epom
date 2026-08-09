@@ -3,8 +3,8 @@ from uuid import UUID
 from datetime import datetime
 
 class DocumentCreate(BaseModel):
-    project_id: UUID
     name: str
+    file: str  
 
 class DocumentUpdate(BaseModel):
     name: str
