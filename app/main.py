@@ -4,12 +4,13 @@ from sqlalchemy import text
 
 from app.database import DBSession
 
-from app.routers import project_router, auth_router
+from app.routers import project_router, auth_router, document_router
 
 app = FastAPI(title="Epom")
 
 app.include_router(auth_router)
 app.include_router(project_router)
+app.include_router(document_router)
 
 
 @app.get("/health/live")
