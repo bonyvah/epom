@@ -31,7 +31,7 @@ async def _get_current_user_project(
 
 async def create_project(
     body: ProjectCreate, current_user: User, db: AsyncSession
-) -> ProjectResponse:
+) -> Project:
 
     project_id = uuid4()
 
@@ -52,7 +52,7 @@ async def create_project(
     await db.commit()
     await db.refresh(project)
 
-    return ProjectResponse.model_validate(project)
+    return project
 
 
 async def get_projects(current_user: User, db: AsyncSession) -> list[Project]:
@@ -67,18 +67,18 @@ async def get_projects(current_user: User, db: AsyncSession) -> list[Project]:
 
 async def get_project_info(
     id: UUID, current_user: User, db: AsyncSession
-) -> ProjectResponse | None:
+) -> Project:
     project = await _get_current_user_project(id, current_user, db)
     if not project:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="project not found"
         )
-    return ProjectResponse.model_validate(project)
+    return project
 
 
 async def update_project_info(
     id: UUID, body: ProjectUpdate, current_user: User, db: AsyncSession
-) -> ProjectResponse | None:
+) -> Project:
     project = await _get_current_user_project(id, current_user, db)
     if not project:
         raise HTTPException(
@@ -93,7 +93,7 @@ async def update_project_info(
     await db.commit()
     await db.refresh(project)
 
-    return ProjectResponse.model_validate(project)
+    return project
 
 
 async def delete_project(id: UUID, current_user: User, db: AsyncSession) -> None:
