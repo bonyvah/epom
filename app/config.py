@@ -11,5 +11,9 @@ class Settings(BaseSettings):
     resend_api_key: str
     sender_email: str
     app_url:str
+    s3_bucket_name: str 
+    aws_access_key_id: str
+    aws_secret_access_key: str
+    aws_region: str
 
 settings = Settings() # type: ignore
