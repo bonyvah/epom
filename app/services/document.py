@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, UploadFile
 from sqlalchemy import select
 
 from uuid import UUID, uuid4
@@ -6,9 +6,8 @@ from uuid import UUID, uuid4
 from app.models import User, Document, Membership, Project
 from app.database import AsyncSession
 from app.services.project import _get_current_user_project
-from app.schemas.document import DocumentCreate
-from app.utils.s3 import upload_file, fetch_file, delete_file
-
+from app.schemas.document import DocumentResponse
+from app.utils.s3 import upload_file,  delete_file, generate_presigned_url
 
 async def get_project_documents(
     project_id: UUID, current_user: User, db: AsyncSession
@@ -22,16 +21,15 @@ async def get_project_documents(
 
     result = await db.execute(
         select(Document).where(
-            Document.project_id == project_id, Document.deleted_at.is_(None)
+            Document.project_id == project_id
         )
     )
 
     return list(result.scalars().all())
 
-
 async def upload_documents_to_project(
     project_id: UUID,
-    documents: list[DocumentCreate],
+    files: list[UploadFile],
     current_user: User,
     db: AsyncSession,
 ) -> list[Document]:
@@ -43,29 +41,30 @@ async def upload_documents_to_project(
         )
 
     docs = []
-    for d in documents:
-        temp = d.name[::-1]
-        if "." not in temp:
-            content_type = "raw"
-        else:
-            content_type = temp[: temp.index(".")]
+    for file in files:
+        contents = await file.read()
 
-        key = f"{d.name}_{project_id}"
+        if len(contents) > 50 * 1024 * 1024:
+            raise HTTPException(status_code=413, detail=f"{file.filename} exceeds 50MB limit")
+
+        document_id = uuid4()
+        key = f"{document_id}/{file.filename}"
+
         try:
-            upload_file(key, d.file)
-        except:
+            upload_file(key, contents, file.content_type)
+        except Exception:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Could not upload document",
+                detail=f"Failed to upload {file.filename}"
             )
 
         document = Document(
-            id=uuid4(),
+            id=document_id,
             project_id=project_id,
-            name=d.name,
+            name=file.filename,
             s3_key=key,
-            size_bytes=len(d.file),
-            content_type=content_type,
+            size_bytes=len(contents),
+            content_type=file.content_type,
             uploaded_by=current_user.id,
         )
         docs.append(document)
@@ -78,8 +77,7 @@ async def upload_documents_to_project(
 
     return docs
 
-
-async def download_file(id: UUID, current_user: User, db: AsyncSession):
+async def download_file(id: UUID, current_user: User, db: AsyncSession) -> dict:
     result = await db.execute(
         select(Document)
         .join(Project, Document.project_id == Project.id)
@@ -87,7 +85,6 @@ async def download_file(id: UUID, current_user: User, db: AsyncSession):
         .where(
             Document.id == id,
             Membership.user_id == current_user.id,
-            Document.deleted_at.is_(None),
         )
     )
 
@@ -98,20 +95,8 @@ async def download_file(id: UUID, current_user: User, db: AsyncSession):
             status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
         )
 
-    try:
-        file = fetch_file(document.s3_key)
-        if not file:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Could not download document",
-            )
-        return file
-    except:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Could not download document",
-        )
-
+    url = generate_presigned_url(document.s3_key)
+    return {"download_url": url}
 
 async def delete_document(id: UUID, current_user: User, db: AsyncSession):
     result = await db.execute(
@@ -121,7 +106,6 @@ async def delete_document(id: UUID, current_user: User, db: AsyncSession):
         .where(
             Document.id == id,
             Membership.user_id == current_user.id,
-            Document.deleted_at.is_(None),
         )
     )
 
@@ -132,16 +116,6 @@ async def delete_document(id: UUID, current_user: User, db: AsyncSession):
             status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
         )
 
-    try:
-        if not delete_file(document.s3_key):
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Could not delete document",
-            )
-    except:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Could not delete document",
-        )
-
+    delete_file(document.s3_key) 
     await db.delete(document)
+    await db.commit()
