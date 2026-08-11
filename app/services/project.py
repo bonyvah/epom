@@ -2,15 +2,15 @@ from fastapi import HTTPException, status
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError
 
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
-from app.models import Project, User, Membership, Role
-from app.schemas.project import ProjectCreate, ProjectResponse, ProjectUpdate
+from app.models import Project, User, Membership, Role, Document
+from app.schemas.project import ProjectCreate, ProjectUpdate
 from app.utils.send_mail import send_mail
 from app.utils.auth import create_invite_token, decode_invite_token
+from app.utils.s3 import delete_file
 from app.config import settings
 
 
@@ -109,8 +109,23 @@ async def delete_project(id: UUID, current_user: User, db: AsyncSession) -> None
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only owners of the project allowed to delete it",
         )
+
+    doc_result = await db.execute(select(Document).where(Document.project_id == id))
+    member_result = await db.execute(select(Membership).where(Membership.project_id == id))
+    documents = doc_result.scalars().all()
+    members = member_result.scalars().all()
+    keys = [d.s3_key for d in documents]
+
     project.deleted_at = datetime.now(timezone.utc)
+    for d in documents:
+        await db.delete(d)
+    for m in members:
+        await db.delete(m)
     await db.commit()
+
+    for k in keys:
+        await delete_file(k)
+
 
 
 async def grant_access_to_project(
@@ -175,7 +190,7 @@ async def send_join_link(
     invite_token = create_invite_token(str(project_id), email)
     link = f"{settings.app_url}/join?token={invite_token}"
 
-    send_mail(settings.sender_email, email, "Join the project: " + project.name, link)
+    await send_mail(settings.sender_email, email, "Join the project: " + project.name, link)
 
 
 async def join_project_via_token(token: str, current_user: User, db: AsyncSession) -> None:
