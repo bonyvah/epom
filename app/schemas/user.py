@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, model_validator
 
 
 class RegisterRequest(BaseModel):
-    login: str = Field(min_length=3, max_length=50)
+    username: str = Field(min_length=3, max_length=50)
     password: str = Field(min_length=8, max_length=128)
     repeat_password: str = Field(min_length=8, max_length=128)
 
@@ -14,7 +14,7 @@ class RegisterRequest(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    login: str
+    username: str
     password: str
 
 

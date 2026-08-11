@@ -21,12 +21,12 @@ def upgrade() -> None:
     """Upgrade schema."""
     op.create_table('users',
     sa.Column('id', sa.Uuid(), nullable=False),
-    sa.Column('login', sa.String(length=255), nullable=False),
+    sa.Column('username', sa.String(length=255), nullable=False),
     sa.Column('hashed_password', sa.Text(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('login')
+    sa.UniqueConstraint('username')
     )
     op.create_table('projects',
     sa.Column('id', sa.Uuid(), nullable=False),

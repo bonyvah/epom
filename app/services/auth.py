@@ -9,7 +9,7 @@ from app.utils.auth import hash_password, verify_password, create_access_token
 
 
 async def register(body: RegisterRequest, db: AsyncSession) -> TokenResponse:
-    user = User(login=body.login, hashed_password=hash_password(body.password))
+    user = User(username=body.username, hashed_password=hash_password(body.password))
     db.add(user)
     try:
         await db.commit()
@@ -26,7 +26,7 @@ async def register(body: RegisterRequest, db: AsyncSession) -> TokenResponse:
 
 async def login(body: LoginRequest, db: AsyncSession) -> TokenResponse:
     result = await db.execute(
-        select(User).where(User.login == body.login, User.deleted_at.is_(None))
+        select(User).where(User.username == body.username, User.deleted_at.is_(None))
     )
     user: User | None = result.scalar_one_or_none()
 
