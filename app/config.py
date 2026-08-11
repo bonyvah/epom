@@ -15,5 +15,6 @@ class Settings(BaseSettings):
     aws_access_key_id: str
     aws_secret_access_key: str
     aws_region: str
+    file_size_limit_mb:int
 
 settings = Settings() # type: ignore

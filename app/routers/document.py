@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, status
 
-from typing import Annotated
+from typing import Annotated, List
 from uuid import UUID
 
 from app.schemas.document import DocumentUpdate, DocumentResponse
@@ -16,12 +16,38 @@ async def get_project_documents(id: UUID, current_user: CurrentUser, db: DBSessi
     return await document_service.get_project_documents(id, current_user, db)
 
 
-@router.post("/project/{id}/documents", response_model=list[DocumentResponse])
-async def upload_project_documents(id: UUID, current_user: CurrentUser, db: DBSession, files: Annotated[list[UploadFile], File(...)]):
+@router.post(
+    "/project/{id}/documents",
+    response_model=list[DocumentResponse],
+    openapi_extra={
+        "requestBody": {
+            "content": {
+                "multipart/form-data": {
+                    "schema": {
+                        "type": "object",
+                        "required": ["files"],
+                        "properties": {
+                            "files": {
+                                "type": "array",
+                                "items": {"type": "string", "format": "binary"},
+                                "description": "Files to upload",
+                            }
+                        },
+                    }
+                }
+            },
+            "required": True,
+        }
+    },
+)
+async def upload_project_documents(id: UUID, current_user: CurrentUser, db: DBSession, files: Annotated[List[UploadFile], File(description="Files to upload")]):
     return await document_service.upload_documents_to_project(id, files, current_user, db)
 
+@router.put("/documents/{id}", response_model=DocumentResponse)
+async def update_document(id: UUID, body: DocumentUpdate, current_user: CurrentUser, db: DBSession):
+    return await document_service.update_document(id, body, current_user, db)
 
-@router.get("/documents/{id}")
+@router.get("/documents/{id}", response_model=dict)
 async def download_file(id: UUID, current_user: CurrentUser, db: DBSession):
     return await document_service.download_file(id, current_user, db)
 
