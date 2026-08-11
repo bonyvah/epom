@@ -35,14 +35,7 @@
 
 ### Scope — Phase 2
 
-- DB normalization / denormalization
-- DB creation with and without ORM
-- S3 + Lambda: image resize (optional), calculate total file size per project + apply limit
+- S3 + Lambda: image resize, calculate total file size per project + apply limit
 - Tests + CI/CD bindings
 - Package setup: pyproject.toml, tox / poetry
 - Pydantic validation on all inputs
-
-### Implementation notes
-
-1. All responses in JSON (except file downloads) + correct HTTP status codes.
-2. All business logic endpoints must be authorized via JWT.
