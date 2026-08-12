@@ -15,3 +15,11 @@ class DocumentResponse(BaseModel):
     uploaded_by: UUID
     created_at: datetime
     updated_at: datetime
+
+# class UploadFailure(BaseModel):
+#     filename:str
+#     error:str
+
+# class UploadDocumentsResponse(BaseModel):
+#     successes: list[DocumentResponse]
+#     failure: list[UploadFailure]

@@ -33,6 +33,8 @@ def upgrade() -> None:
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('owner_id', sa.Uuid(), nullable=False),
+    sa.Column("project_size_limit_gb", sa.Integer(), nullable=False, server_default='1'),
+    sa.Column("document_size_limit_mb", sa.Integer(), nullable=False, server_default='50'),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
