@@ -20,5 +20,5 @@ async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: DBSession
 ):
     return await auth_service.login(
-        LoginRequest(login=form_data.username, password=form_data.password), db
+        LoginRequest(username=form_data.username, password=form_data.password), db
     )

@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import String, DateTime, Text, func, ForeignKey
+from sqlalchemy import String, DateTime, Text, func, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -16,6 +16,8 @@ class Project(Base):
     owner_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="RESTRICT"), nullable=False
     )
+    project_size_limit_gb: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    document_size_limit_mb: Mapped[int] = mapped_column(Integer, nullable=False, default=50)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

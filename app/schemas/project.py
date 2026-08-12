@@ -26,6 +26,7 @@ class ProjectResponse(BaseModel):
     owner_id: UUID
     created_at: datetime
     updated_at: datetime
-
+    project_size_limit_gb: int
+    document_size_limit_mb: int
 class InviteUserRequest(BaseModel):
     user_id: UUID

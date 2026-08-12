@@ -13,6 +13,8 @@ dependencies = [
     "PyJWT",
     "python-multipart",
     "resend",
+    "boto3",
+    "filetype",
 ]
 
 [build-system]

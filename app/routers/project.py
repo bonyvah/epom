@@ -3,15 +3,15 @@ from fastapi import APIRouter, status
 from uuid import UUID
 
 from app.schemas.project import ProjectResponse, ProjectCreate, ProjectUpdate, InviteUserRequest
-from app.dependencies import CurrentUser
+from app.dependencies import CurrentUser, PaginationParamsDep
 from app.database import DBSession
 from app.services import project as project_service
 
 router = APIRouter(tags=["projects"])
 
 @router.get("/projects", response_model=list[ProjectResponse])
-async def get_projects(current_user: CurrentUser, db:DBSession):
-    return await project_service.get_projects(current_user, db)
+async def get_projects(pagination:PaginationParamsDep, current_user: CurrentUser, db:DBSession):
+    return await project_service.get_projects(pagination,current_user, db)
 
 @router.post("/project", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
 async def create_project(body: ProjectCreate, current_user: CurrentUser, db: DBSession):

@@ -8,6 +8,7 @@ from sqlalchemy import select
 from app.database import get_db
 from app.models import User
 from app.utils.auth import decode_access_token
+from app.schemas.pagination import PaginationParams
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
@@ -28,3 +29,5 @@ async def get_current_user(
     return user
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+PaginationParamsDep = Annotated[PaginationParams, Depends()]

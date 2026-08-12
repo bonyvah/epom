@@ -21,18 +21,20 @@ def upgrade() -> None:
     """Upgrade schema."""
     op.create_table('users',
     sa.Column('id', sa.Uuid(), nullable=False),
-    sa.Column('login', sa.String(length=255), nullable=False),
+    sa.Column('username', sa.String(length=255), nullable=False),
     sa.Column('hashed_password', sa.Text(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('login')
+    sa.UniqueConstraint('username')
     )
     op.create_table('projects',
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('owner_id', sa.Uuid(), nullable=False),
+    sa.Column("project_size_limit_gb", sa.Integer(), nullable=False, server_default='1'),
+    sa.Column("document_size_limit_mb", sa.Integer(), nullable=False, server_default='50'),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
@@ -44,12 +46,11 @@ def upgrade() -> None:
     sa.Column('project_id', sa.Uuid(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('s3_key', sa.Text(), nullable=False),
-    sa.Column('size_bytes', sa.BigInteger(), nullable=True),
+    sa.Column('size_bytes', sa.BigInteger(), nullable=False),
     sa.Column('content_type', sa.Text(), nullable=False),
     sa.Column('uploaded_by', sa.Uuid(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['uploaded_by'], ['users.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id')
