@@ -4,15 +4,15 @@ from fastapi import HTTPException, status, UploadFile
 from sqlalchemy import select, func
 
 from uuid import UUID, uuid4
-import logging
 
 from app.models import User, Document, Membership, Project
 from app.database import AsyncSession
 from app.services.project import _get_current_user_project
 from app.schemas.document import DocumentUpdate
+from app.schemas.pagination import PaginationParams
 from app.utils.s3 import upload_file, delete_file, generate_presigned_url
 from app.utils.file import validate_and_infer_mime
-from app.config import settings
+
 
 async def _get_current_user_document(id: UUID, current_user: User, db: AsyncSession):
     result = await db.execute(
@@ -30,7 +30,7 @@ async def _get_current_user_document(id: UUID, current_user: User, db: AsyncSess
 
 
 async def get_project_documents(
-    project_id: UUID, current_user: User, db: AsyncSession
+    project_id: UUID, pagination: PaginationParams, current_user: User, db: AsyncSession
 ) -> list[Document]:
     project = await _get_current_user_project(project_id, current_user, db)
 
@@ -39,7 +39,12 @@ async def get_project_documents(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
 
-    result = await db.execute(select(Document).where(Document.project_id == project_id))
+    result = await db.execute(
+        select(Document)
+        .where(Document.project_id == project_id)
+        .offset(pagination.offset)
+        .limit(pagination.size)
+    )
 
     return list(result.scalars().all())
 
@@ -63,12 +68,8 @@ async def upload_document_to_project(
     try:
         inferred_content_type = validate_and_infer_mime(file.filename or "", contents)
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    
     # 3. size checks
     if file_size > project.document_size_limit_mb * 1024 * 1024:
         raise HTTPException(

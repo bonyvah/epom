@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 
 from app.models import Project, User, Membership, Role, Document
 from app.schemas.project import ProjectCreate, ProjectUpdate
+from app.schemas.pagination import PaginationParams
 from app.utils.send_mail import send_mail
 from app.utils.auth import create_invite_token, decode_invite_token
 from app.utils.s3 import delete_file
@@ -55,19 +56,21 @@ async def create_project(
     return project
 
 
-async def get_projects(current_user: User, db: AsyncSession) -> list[Project]:
+async def get_projects(
+    pagination: PaginationParams, current_user: User, db: AsyncSession
+) -> list[Project]:
     result = await db.execute(
         select(Project)
         .join(Membership, Membership.project_id == Project.id)
         .where(Membership.user_id == current_user.id, Project.deleted_at.is_(None))
+        .offset(pagination.offset)
+        .limit(pagination.size)
     )
 
     return list(result.scalars().all())
 
 
-async def get_project_info(
-    id: UUID, current_user: User, db: AsyncSession
-) -> Project:
+async def get_project_info(id: UUID, current_user: User, db: AsyncSession) -> Project:
     project = await _get_current_user_project(id, current_user, db)
     if not project:
         raise HTTPException(
@@ -111,7 +114,9 @@ async def delete_project(id: UUID, current_user: User, db: AsyncSession) -> None
         )
 
     doc_result = await db.execute(select(Document).where(Document.project_id == id))
-    member_result = await db.execute(select(Membership).where(Membership.project_id == id))
+    member_result = await db.execute(
+        select(Membership).where(Membership.project_id == id)
+    )
     documents = doc_result.scalars().all()
     members = member_result.scalars().all()
     keys = [d.s3_key for d in documents]
@@ -125,7 +130,6 @@ async def delete_project(id: UUID, current_user: User, db: AsyncSession) -> None
 
     for k in keys:
         await delete_file(k)
-
 
 
 async def grant_access_to_project(
@@ -190,10 +194,14 @@ async def send_join_link(
     invite_token = create_invite_token(str(project_id), email)
     link = f"{settings.app_url}/join?token={invite_token}"
 
-    await send_mail(settings.sender_email, email, "Join the project: " + project.name, link)
+    await send_mail(
+        settings.sender_email, email, "Join the project: " + project.name, link
+    )
 
 
-async def join_project_via_token(token: str, current_user: User, db: AsyncSession) -> None:
+async def join_project_via_token(
+    token: str, current_user: User, db: AsyncSession
+) -> None:
     project_id = UUID(decode_invite_token(token))
 
     if await _get_current_user_project(project_id, current_user, db):

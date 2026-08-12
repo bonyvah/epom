@@ -5,15 +5,15 @@ from uuid import UUID
 
 from app.schemas.document import DocumentUpdate, DocumentResponse #, UploadDocumentsResponse
 from app.services import document as document_service
-from app.dependencies import CurrentUser
+from app.dependencies import CurrentUser, PaginationParamsDep
 from app.database import DBSession
 
 router = APIRouter(tags=["document"])
 
 
 @router.get("/project/{id}/documents", response_model=list[DocumentResponse])
-async def get_project_documents(id: UUID, current_user: CurrentUser, db: DBSession):
-    return await document_service.get_project_documents(id, current_user, db)
+async def get_project_documents(id: UUID,pagination:PaginationParamsDep, current_user: CurrentUser, db: DBSession):
+    return await document_service.get_project_documents(id,pagination, current_user, db)
 
 @router.post("/project/{id}/document", response_model=DocumentResponse)
 async def upload_document_to_project(id: UUID, file: UploadFile, current_user: CurrentUser, db:DBSession):
