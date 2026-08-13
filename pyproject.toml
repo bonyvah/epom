@@ -17,9 +17,15 @@ dependencies = [
     "filetype",
 ]
 
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+[tool.poetry]
+packages = [{include = "app"}]
 
-[tool.setuptools.packages.find]
-include = ["app*"]
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-asyncio = "*"
+httpx = "*"
+tox = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
