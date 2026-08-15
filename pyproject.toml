@@ -26,6 +26,7 @@ pytest-asyncio = "*"
 httpx = "*"
 tox = "*"
 pytest-cov = "*"
+ruff = "*"
 
 [build-system]
 requires = ["poetry-core"]
