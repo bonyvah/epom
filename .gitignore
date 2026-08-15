@@ -9,3 +9,4 @@ plan
 *.egg-info/
 .tox/
 .pytest_cache/
+.coverage
