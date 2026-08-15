@@ -1,10 +1,15 @@
-from fastapi import APIRouter, status
-
 from uuid import UUID
 
-from app.schemas.project import ProjectResponse, ProjectCreate, ProjectUpdate, InviteUserRequest
-from app.dependencies import CurrentUser, PaginationParamsDep
+from fastapi import APIRouter, status
+
 from app.database import DBSession
+from app.dependencies import CurrentUser, PaginationParamsDep
+from app.schemas.project import (
+    InviteUserRequest,
+    ProjectCreate,
+    ProjectResponse,
+    ProjectUpdate,
+)
 from app.services import project as project_service
 
 router = APIRouter(tags=["projects"])

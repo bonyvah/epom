@@ -1,12 +1,14 @@
-from fastapi import APIRouter, UploadFile, File, status
-
-from typing import Annotated, List
 from uuid import UUID
 
-from app.schemas.document import DocumentUpdate, DocumentResponse #, UploadDocumentsResponse
-from app.services import document as document_service
-from app.dependencies import CurrentUser, PaginationParamsDep
+from fastapi import APIRouter, UploadFile, status
+
 from app.database import DBSession
+from app.dependencies import CurrentUser, PaginationParamsDep
+from app.schemas.document import (  #, UploadDocumentsResponse
+    DocumentResponse,
+    DocumentUpdate,
+)
+from app.services import document as document_service
 
 router = APIRouter(tags=["document"])
 

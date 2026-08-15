@@ -1,6 +1,8 @@
+import asyncio
+
 import boto3
 from botocore.config import Config
-import asyncio
+
 from app.config import settings
 
 s3 = boto3.client(

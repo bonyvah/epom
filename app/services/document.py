@@ -1,17 +1,15 @@
-import filetype
-from fastapi import HTTPException, status, UploadFile
-
-from sqlalchemy import select, func
-
 from uuid import UUID, uuid4
 
-from app.models import User, Document, Membership, Project
+from fastapi import HTTPException, UploadFile, status
+from sqlalchemy import func, select
+
 from app.database import AsyncSession
-from app.services.project import _get_current_user_project
+from app.models import Document, Membership, Project, User
 from app.schemas.document import DocumentUpdate
 from app.schemas.pagination import PaginationParams
-from app.utils.s3 import upload_file, delete_file, generate_presigned_url
+from app.services.project import _get_current_user_project
 from app.utils.file import validate_and_infer_mime
+from app.utils.s3 import delete_file, generate_presigned_url, upload_file
 
 
 async def _get_current_user_document(id: UUID, current_user: User, db: AsyncSession):
@@ -66,7 +64,7 @@ async def upload_document_to_project(
 
     # 2. Magic Bytes & Type Validation (Using the utility)
     try:
-        inferred_content_type = validate_and_infer_mime(file.filename or "", contents)
+        validate_and_infer_mime(file.filename or "", contents)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -96,7 +94,7 @@ async def upload_document_to_project(
 
     try:
         await upload_file(key, contents, content_type)
-    except Exception as e:
+    except Exception:  # noqa: BLE001
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to upload file",
@@ -169,7 +167,7 @@ async def delete_document(id: UUID, current_user: User, db: AsyncSession):
 
     try:
         await delete_file(document.s3_key)
-    except Exception:
+    except Exception:  # noqa: BLE001
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to delete file",

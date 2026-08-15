@@ -4,8 +4,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import User
-from app.schemas.user import RegisterRequest, LoginRequest, TokenResponse
-from app.utils.auth import hash_password, verify_password, create_access_token
+from app.schemas.user import LoginRequest, RegisterRequest, TokenResponse
+from app.utils.auth import create_access_token, hash_password, verify_password
 
 
 async def register(body: RegisterRequest, db: AsyncSession) -> TokenResponse:

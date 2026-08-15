@@ -1,5 +1,5 @@
-import uuid
 import enum
+import uuid
 from datetime import datetime
 
 from sqlalchemy import DateTime, Enum, ForeignKey, func

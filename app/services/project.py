@@ -1,18 +1,17 @@
-from fastapi import HTTPException, status
+from datetime import UTC, datetime
+from uuid import UUID, uuid4
 
+from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from datetime import datetime, timezone
-from uuid import UUID, uuid4
-
-from app.models import Project, User, Membership, Role, Document
-from app.schemas.project import ProjectCreate, ProjectUpdate
+from app.config import settings
+from app.models import Document, Membership, Project, Role, User
 from app.schemas.pagination import PaginationParams
-from app.utils.send_mail import send_mail
+from app.schemas.project import ProjectCreate, ProjectUpdate
 from app.utils.auth import create_invite_token, decode_invite_token
 from app.utils.s3 import delete_file
-from app.config import settings
+from app.utils.send_mail import send_mail
 
 
 async def _get_current_user_project(
@@ -121,7 +120,7 @@ async def delete_project(id: UUID, current_user: User, db: AsyncSession) -> None
     members = member_result.scalars().all()
     keys = [d.s3_key for d in documents]
 
-    project.deleted_at = datetime.now(timezone.utc)
+    project.deleted_at = datetime.now(UTC)
     for d in documents:
         await db.delete(d)
     for m in members:

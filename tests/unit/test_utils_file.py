@@ -1,5 +1,7 @@
 import pytest
+
 from app.utils.file import validate_and_infer_mime
+
 
 def test_validate_and_infer_mime_pdf():
     # PDF magic bytes: %PDF-
@@ -17,14 +19,14 @@ def test_validate_and_infer_mime_png():
 
 def test_validate_and_infer_mime_txt():
     # UTF-8 text file
-    text_bytes = "This is a simple text file.".encode("utf-8")
+    text_bytes = b"This is a simple text file."
     mime = validate_and_infer_mime("readme.txt", text_bytes)
     assert mime == "text/plain"
 
 
 def test_validate_and_infer_mime_unsupported_extension():
     # UTF-8 code but extension is not .txt
-    text_bytes = "print('hello')".encode("utf-8")
+    text_bytes = b"print('hello')"
     with pytest.raises(ValueError) as exc_info:
         validate_and_infer_mime("script.py", text_bytes)
     assert "Unsupported file type" in str(exc_info.value)

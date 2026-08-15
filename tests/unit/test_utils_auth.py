@@ -1,15 +1,17 @@
-import pytest
 import jwt
+import pytest
 from fastapi import HTTPException
+
+from app.config import settings
 from app.utils.auth import (
+    create_access_token,
+    create_invite_token,
+    decode_access_token,
+    decode_invite_token,
     hash_password,
     verify_password,
-    create_access_token,
-    decode_access_token,
-    create_invite_token,
-    decode_invite_token,
 )
-from app.config import settings
+
 
 def test_password_hashing_and_verification():
     password = "supersecretpassword123"

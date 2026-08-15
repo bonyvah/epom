@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field, ConfigDict, field_validator
-from uuid import UUID
 from datetime import datetime
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 
 class ProjectCreate(BaseModel):
     name: str = Field(min_length=1, max_length=256)

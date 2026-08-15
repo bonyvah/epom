@@ -1,5 +1,7 @@
-import resend
 import asyncio
+
+import resend
+
 from app.config import settings
 
 resend.api_key = settings.resend_api_key
