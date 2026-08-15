@@ -4,7 +4,6 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHashError
 from fastapi import HTTPException, status
 
-from uuid import UUID
 from datetime import datetime, timezone, timedelta
 from app.config import settings
 
@@ -35,7 +34,10 @@ def decode_access_token(token: str) -> str:
         payload = jwt.decode(
             token, settings.secret_key, algorithms=[settings.algorithm]
         )
-        return payload["sub"]
+        subject = payload.get("sub")
+        if not subject:
+            raise InvalidTokenError("Token payload missing 'sub' claim")
+        return subject
     except InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
