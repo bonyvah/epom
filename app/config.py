@@ -10,13 +10,14 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
-    app_env: Literal["dev","prod", "test"]
+    app_env: Literal["dev", "prod", "test"]
     resend_api_key: str
     sender_email: str
-    app_url:str
-    s3_bucket_name: str 
+    app_url: str
+    s3_bucket_name: str
     aws_access_key_id: str
     aws_secret_access_key: str
     aws_region: str
 
-settings = Settings() # type: ignore
+
+settings = Settings()  # type: ignore
