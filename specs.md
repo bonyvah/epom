@@ -20,30 +20,22 @@
 | --- | --- | --- |
 | POST | /auth | Register user (login, password, repeat password) |
 | POST | /login | Login → returns JWT |
-| POST | /projects | Create project (auto-assigns owner) |
+| POST | /project | Create project (auto-assigns owner) |
 | GET | /projects | List all accessible projects (full info) |
-| GET | /project/<id>/info | Get project details |
-| PUT | /project/<id>/info | Update project name/description |
-| DELETE | /project/<id> | Delete project + documents (owner only) |
-| GET | /project/<id>/documents | List project documents |
-| POST | /project/<id>/documents | Upload document(s) |
-| GET | /document/<id> | Download document |
-| PUT | /document/<id> | Update document |
-| DELETE | /document/<id> | Delete document |
-| POST | /project/<id>/invite | Grant access to a user (owner only) |
-
-**Optional:** `GET /project/<id>/share?with=<email>` — send a join link with hashed token to an email.
+| GET | /project/<id\>/info | Get project details |
+| PUT | /project/<id\>/info | Update project name/description |
+| DELETE | /project/<id\> | Delete project + documents (owner only) |
+| POST | /project/<id\>/invite | Grant access to a user (owner only) |
+| POST | /project/<id\>/share?email=<email\> | send a join link with hashed token to an email. |
+| GET | /project/<id\>/documents | List project documents |
+| POST | /project/<id\>/documents | Upload document(s) |
+| GET | /document/<id\> | Download document |
+| PUT | /document/<id\> | Update document |
+| DELETE | /document/<id\> | Delete document |
 
 ### Scope — Phase 2
 
-- DB normalization / denormalization
-- DB creation with and without ORM
-- S3 + Lambda: image resize (optional), calculate total file size per project + apply limit
+- S3 + Lambda: image resize, calculate total file size per project + apply limit
 - Tests + CI/CD bindings
 - Package setup: pyproject.toml, tox / poetry
 - Pydantic validation on all inputs
-
-### Implementation notes
-
-1. All responses in JSON (except file downloads) + correct HTTP status codes.
-2. All business logic endpoints must be authorized via JWT.

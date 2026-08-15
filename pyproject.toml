@@ -1,0 +1,49 @@
+[project]
+name = "epom"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]",
+    "sqlalchemy[asyncio]",
+    "asyncpg",
+    "alembic",
+    "pydantic-settings",
+    "argon2-cffi",
+    "psycopg2-binary",
+    "PyJWT",
+    "python-multipart",
+    "resend",
+    "boto3",
+    "filetype",
+]
+
+[tool.poetry]
+packages = [{include = "app"}]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-asyncio = "*"
+httpx = "*"
+tox = "*"
+pytest-cov = "*"
+ruff = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["app"]
+concurrency = ["greenlet"] 
+omit = [
+    "app/config.py",      
+    "app/database.py",  
+]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80           
