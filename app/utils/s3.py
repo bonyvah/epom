@@ -1,6 +1,8 @@
+import asyncio
+
 import boto3
 from botocore.config import Config
-import asyncio
+
 from app.config import settings
 
 s3 = boto3.client(
@@ -8,7 +10,7 @@ s3 = boto3.client(
     aws_access_key_id=settings.aws_access_key_id,
     aws_secret_access_key=settings.aws_secret_access_key,
     region_name=settings.aws_region,
-    config=Config(signature_version="s3v4", s3={'addressing_style': 'virtual'}),
+    config=Config(signature_version="s3v4", s3={"addressing_style": "virtual"}),
 )
 
 
@@ -25,7 +27,7 @@ async def upload_file(key: str, contents: bytes, content_type: str | None) -> No
 async def generate_presigned_url(key: str, expires_in: int = 3600) -> str:
     return await asyncio.to_thread(
         s3.generate_presigned_url,
-        ClientMethod='get_object',
+        ClientMethod="get_object",
         Params={"Bucket": settings.s3_bucket_name, "Key": key},
         ExpiresIn=expires_in,
     )

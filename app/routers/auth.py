@@ -1,10 +1,10 @@
-from fastapi import APIRouter, status, Depends
-from fastapi.security import OAuth2PasswordRequestForm
-
 from typing import Annotated
 
-from app.schemas.user import RegisterRequest, LoginRequest, TokenResponse
+from fastapi import APIRouter, Depends, status
+from fastapi.security import OAuth2PasswordRequestForm
+
 from app.database import DBSession
+from app.schemas.user import LoginRequest, RegisterRequest, TokenResponse
 from app.services import auth as auth_service
 
 router = APIRouter(tags=["auth"])

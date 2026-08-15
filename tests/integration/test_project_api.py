@@ -1,11 +1,13 @@
-import pytest
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from uuid import uuid4
 
-from app.models import Project, Membership, Role, User
+import pytest
+from httpx import AsyncClient
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import Membership, Project, Role, User
 from app.utils.auth import hash_password
+
 
 @pytest.mark.asyncio
 async def test_create_project(client: AsyncClient, auth_headers: dict, db_session: AsyncSession):

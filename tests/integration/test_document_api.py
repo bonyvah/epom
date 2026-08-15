@@ -1,10 +1,11 @@
+from uuid import uuid4
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from uuid import uuid4
 
-from app.models import Project, Document, User
-from app.utils.auth import hash_password
+from app.models import Document, Project
+
 
 @pytest.mark.asyncio
 async def test_upload_document_success(

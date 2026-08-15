@@ -1,7 +1,10 @@
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from app.utils.s3 import upload_file, delete_file, generate_presigned_url
+
+from app.utils.s3 import delete_file, generate_presigned_url, upload_file
 from app.utils.send_mail import send_mail
+
 
 @pytest.mark.asyncio
 async def test_s3_upload_file():

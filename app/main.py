@@ -3,8 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
 from app.database import DBSession
-
-from app.routers import project_router, auth_router, document_router
+from app.routers import auth_router, document_router, project_router
 
 app = FastAPI(title="Epom")
 
@@ -23,7 +22,7 @@ async def readiness(db: DBSession):
     try:
         await db.execute(text("SELECT 1"))
         return {"status": "ok", "db": "connected"}
-    except Exception:
+    except Exception:  # noqa: BLE001
         return JSONResponse(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             content={"status": "error", "db": "unavailable"},
