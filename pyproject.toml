@@ -25,6 +25,7 @@ pytest = "*"
 pytest-asyncio = "*"
 httpx = "*"
 tox = "*"
+pytest-cov = "*"
 
 [build-system]
 requires = ["poetry-core"]
@@ -33,3 +34,14 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "app/config.py",      
+    "app/database.py",  
+]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80           
