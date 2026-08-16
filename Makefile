@@ -20,3 +20,7 @@ shell:
 test:
 	docker compose up -d db_test
 	poetry run pytest
+
+test-cov:
+	docker compose up -d db_test
+	poetry run pytest --cov

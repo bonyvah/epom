@@ -50,6 +50,7 @@ make test
 | `make logs` | Tail live logs |
 | `make shell` | Open a shell inside the API container |
 | `make test` | Run the pytest test suite |
+| `make test-cov` | Run the pytest test coverage |
 
 ## Limitations & Stub Features
 
