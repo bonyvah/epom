@@ -57,4 +57,4 @@ Alternatively, you can run `tox` directly to run testing/linting in isolated vir
 
 ## Limitations & Stub Features
 
-- **Virus Scanner Simulation**: The virus scanner (implemented in `lambda/handler.py`) is a demonstration stub. It randomly clean-marks or quarantines uploaded documents to simulate scanning behavior, and does not perform actual contents scanning. For a real production environment, a service like ClamAV running as a container or an S3 quarantine bucket workflow should be integrated.
+- **Virus Scanner Simulation**: The virus scanner (implemented in `lambda/handler.py`) is a demonstration stub. It randomly clean-marks or quarantines uploaded documents to simulate scanning behavior, and does not perform actual contents scanning.

@@ -20,7 +20,6 @@ async def _get_current_user_document(id: UUID, current_user: User, db: AsyncSess
         .where(
             Document.id == id,
             Membership.user_id == current_user.id,
-            Project.deleted_at.is_(None),
         )
     )
 

@@ -23,7 +23,6 @@ async def _get_current_user_project(
         .where(
             Membership.user_id == current_user.id,
             Project.id == id,
-            Project.deleted_at.is_(None),
         )
     )
     return result.scalar_one_or_none()
@@ -61,7 +60,7 @@ async def get_projects(
     result = await db.execute(
         select(Project)
         .join(Membership, Membership.project_id == Project.id)
-        .where(Membership.user_id == current_user.id, Project.deleted_at.is_(None))
+        .where(Membership.user_id == current_user.id)
         .offset(pagination.offset)
         .limit(pagination.size)
     )
@@ -113,22 +112,17 @@ async def delete_project(id: UUID, current_user: User, db: AsyncSession) -> None
         )
 
     doc_result = await db.execute(select(Document).where(Document.project_id == id))
-    member_result = await db.execute(
-        select(Membership).where(Membership.project_id == id)
-    )
     documents = doc_result.scalars().all()
-    members = member_result.scalars().all()
     keys = [d.s3_key for d in documents]
 
-    project.deleted_at = datetime.now(UTC)
-    for d in documents:
-        await db.delete(d)
-    for m in members:
-        await db.delete(m)
+    await db.delete(project)
     await db.commit()
 
     for k in keys:
-        await delete_file(k)
+        try:
+            await delete_file(k)
+        except Exception:  # noqa: BLE001
+            pass
 
 
 async def grant_access_to_project(

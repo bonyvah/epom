@@ -62,6 +62,12 @@ async def test_delete_project_owner_only(client: AsyncClient, auth_headers: dict
     response = await client.delete(f"/project/{test_project.id}", headers=auth_headers)
     assert response.status_code == 204
 
+    # Verify project is hard-deleted from the database
+    result = await db_session.execute(
+        select(Project).where(Project.id == test_project.id)
+    )
+    assert result.scalar_one_or_none() is None
+
 
 @pytest.mark.asyncio
 async def test_delete_project_forbidden_for_non_owner(client: AsyncClient, test_project: Project, db_session: AsyncSession):

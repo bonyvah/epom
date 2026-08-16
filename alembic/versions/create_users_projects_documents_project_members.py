@@ -37,8 +37,7 @@ def upgrade() -> None:
     sa.Column("document_size_limit_mb", sa.Integer(), nullable=False, server_default='50'),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
-    sa.ForeignKeyConstraint(['owner_id'], ['users.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['owner_id'], ['users.id']),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('documents',
