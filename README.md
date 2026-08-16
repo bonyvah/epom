@@ -36,13 +36,9 @@ Migrations run automatically on startup. Once ready:
 
 ## Running Tests
 
-The integration tests depend on a test database running on port `5433` (managed by Docker Compose). To start the database container and run the tests, execute:
-
 ```bash
 make test
 ```
-
-Alternatively, you can run `tox` directly to run testing/linting in isolated virtual environments.
 
 ## Make Commands
 
@@ -53,7 +49,7 @@ Alternatively, you can run `tox` directly to run testing/linting in isolated vir
 | `make down` | Stop and remove containers |
 | `make logs` | Tail live logs |
 | `make shell` | Open a shell inside the API container |
-| `make test` | Run the pytest test suite (spins up `db_test` container automatically) |
+| `make test` | Run the pytest test suite |
 
 ## Limitations & Stub Features
 
