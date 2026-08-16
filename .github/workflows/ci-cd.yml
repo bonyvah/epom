@@ -80,6 +80,7 @@ jobs:
     # Only run on pushes/merges to the main branch
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    environment: prod
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
