@@ -20,19 +20,17 @@ jobs:
           python-version: '3.12'
       - name: Install Poetry
         run: pipx install poetry
-      - name: Cache venv and tox
+      - name: Cache venv
         uses: actions/cache@v4
         with:
-          path: |
-            .venv
-            .tox
-          key: deps-${{ runner.os }}-py3.12-${{ hashFiles('**/poetry.lock') }}
+          path: .venv
+          key: lint-venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
-            deps-${{ runner.os }}-py3.12-
+            lint-venv-${{ runner.os }}-
       - name: Install dependencies
-        run: poetry install --no-root
-      - name: Run Linter (Ruff)
-        run: poetry run tox -e lint
+        run: poetry install --no-root --only lint,main # or: poetry install --no-root
+      - name: Run Ruff Linter & Formatter
+        run: poetry run ruff check .
 
   # 2. TEST JOB
   test:
@@ -73,25 +71,22 @@ jobs:
           python-version: '3.12'
       - name: Install Poetry
         run: pipx install poetry
-      - name: Cache venv and tox
+      - name: Cache venv
         uses: actions/cache@v4
         with:
-          path: |
-            .venv
-            .tox
-          key: deps-${{ runner.os }}-py3.12-${{ hashFiles('**/poetry.lock') }}
+          path: .venv
+          key: test-venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
-            deps-${{ runner.os }}-py3.12-
+            test-venv-${{ runner.os }}-
       - name: Install dependencies
         run: poetry install --no-root
       - name: Run Tests
-        run: poetry run tox -e py312
+        run: poetry run pytest
 
   # 3. CD (DEPLOY) JOB
   deploy:
     name: Build & Push Docker Image
     needs: [lint, test]
-    # Only run on pushes/merges to the main branch
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     environment: prod
@@ -126,4 +121,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max 
+          cache-to: type=gha,mode=max
