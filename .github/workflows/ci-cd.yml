@@ -10,6 +10,8 @@ jobs:
   # 1. LINT JOB
   lint:
     runs-on: ubuntu-latest
+    env:
+      POETRY_VIRTUALENVS_IN_PROJECT: true
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -34,6 +36,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
+      POETRY_VIRTUALENVS_IN_PROJECT: true
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5433/epom_test
       SECRET_KEY: changemechangemechangemechangeme
       ALGORITHM: HS256
