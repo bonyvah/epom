@@ -19,15 +19,17 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install Poetry
-        run: pip install poetry
-      - name: Load cached venv
-        id: cached-poetry-dependencies
+        run: pipx install poetry
+      - name: Cache venv and tox
         uses: actions/cache@v4
         with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          path: |
+            .venv
+            .tox
+          key: deps-${{ runner.os }}-py3.12-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            deps-${{ runner.os }}-py3.12-
       - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-root
       - name: Run Linter (Ruff)
         run: poetry run tox -e lint
@@ -70,15 +72,17 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install Poetry
-        run: pip install poetry
-      - name: Load cached venv
-        id: cached-poetry-dependencies
+        run: pipx install poetry
+      - name: Cache venv and tox
         uses: actions/cache@v4
         with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          path: |
+            .venv
+            .tox
+          key: deps-${{ runner.os }}-py3.12-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            deps-${{ runner.os }}-py3.12-
       - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-root
       - name: Run Tests
         run: poetry run tox -e py312
