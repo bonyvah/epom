@@ -55,3 +55,30 @@ make test
 ## Limitations & Stub Features
 
 - **Virus Scanner Simulation**: The virus scanner (implemented in `lambda/handler.py`) is a demonstration stub. It randomly clean-marks or quarantines uploaded documents to simulate scanning behavior, and does not perform actual contents scanning.
+
+## System Architecture
+
+```mermaid
+graph TD
+    Client[Client] -->|REST API| API[FastAPI Application]
+    API -->|ORM / SQL| DB[(PostgreSQL)]
+    API -->|Upload / Download| S3[(AWS S3)]
+    S3 -->|ObjectCreated Event| Lambda[AWS Lambda Virus Scanner]
+```
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/auth` | `POST` | Register user |
+| `/login` | `POST` | User login (JWT) |
+| `/projects` | `GET` | List user's projects |
+| `/project` | `POST` | Create project |
+| `/project/{id}/info` | `GET` / `PUT` | Get / Update project details |
+| `/project/{id}` | `DELETE` | Delete project |
+| `/project/{id}/invite` | `POST` | Invite user directly by ID |
+| `/project/{id}/share` | `POST` | Email invitation link |
+| `/join` | `GET` | Join project via token |
+| `/project/{id}/documents` | `GET` | List project documents |
+| `/project/{id}/document` | `POST` | Upload document |
+| `/document/{id}` | `GET` / `PUT` / `DELETE` | Download (URL) / Rename / Delete document |
