@@ -18,19 +18,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install Poetry
-        run: pipx install poetry
-      - name: Cache venv
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: lint-venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            lint-venv-${{ runner.os }}-
-      - name: Install dependencies
-        run: poetry install --no-root --only lint,main # or: poetry install --no-root
-      - name: Run Ruff Linter & Formatter
-        run: poetry run ruff check .
+      - name: Install Poetry & Dependencies
+        run: |
+          pip install poetry
+          poetry install --no-root
+      - name: Run Linter (Ruff)
+        run: poetry run tox -e lint
 
   # 2. TEST JOB
   test:
@@ -120,5 +113,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
