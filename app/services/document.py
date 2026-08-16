@@ -117,7 +117,7 @@ async def upload_document_to_project(
         await db.rollback()
         try:
             await delete_file(key)
-        except Exception:  # noqa: BLE001
+        except Exception:  # noqa: BLE001, S110
             pass
         raise
 

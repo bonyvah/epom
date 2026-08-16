@@ -1,4 +1,3 @@
-from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException, status
@@ -121,7 +120,7 @@ async def delete_project(id: UUID, current_user: User, db: AsyncSession) -> None
     for k in keys:
         try:
             await delete_file(k)
-        except Exception:  # noqa: BLE001
+        except Exception:  # noqa: BLE001, S110
             pass
 
 
