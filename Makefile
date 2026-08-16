@@ -16,3 +16,7 @@ logs:
 
 shell:
 	docker compose exec api sh
+
+test:
+	docker compose up -d db_test
+	poetry run pytest

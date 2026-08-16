@@ -111,8 +111,16 @@ async def upload_document_to_project(
         uploaded_by=current_user.id,
     )
     db.add(document)
-    await db.commit()
-    await db.refresh(document)
+    try:
+        await db.commit()
+        await db.refresh(document)
+    except Exception:
+        await db.rollback()
+        try:
+            await delete_file(key)
+        except Exception:  # noqa: BLE001
+            pass
+        raise
 
     return document
 

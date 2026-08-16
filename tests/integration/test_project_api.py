@@ -103,3 +103,64 @@ async def test_send_join_link_success(client: AsyncClient, auth_headers: dict, t
     response = await client.post(f"/project/{test_project.id}/share", params={"email": email}, headers=auth_headers)
     assert response.status_code == 202
     assert mock_s3_and_mail["send_mail"].called
+
+
+@pytest.mark.asyncio
+async def test_join_project_flow(client: AsyncClient, auth_headers: dict, test_project: Project, mock_s3_and_mail: dict, db_session: AsyncSession):
+    # 1. Invite a member
+    email = "invitee@example.com"
+    response = await client.post(f"/project/{test_project.id}/share", params={"email": email}, headers=auth_headers)
+    assert response.status_code == 202
+
+    # 2. Extract invite link and token from mock mail call
+    assert mock_s3_and_mail["send_mail"].called
+    call_args = mock_s3_and_mail["send_mail"].call_args[0]
+    link = call_args[3]
+    
+    import urllib.parse
+    parsed = urllib.parse.urlparse(link)
+    params = urllib.parse.parse_qs(parsed.query)
+    token = params["token"][0]
+
+    # 3. Create a new user (invitee)
+    invitee = User(username=email, hashed_password=hash_password("inviteepass"))
+    db_session.add(invitee)
+    await db_session.commit()
+
+    from app.utils.auth import create_access_token
+    invitee_token = create_access_token(str(invitee.id))
+    invitee_headers = {"Authorization": f"Bearer {invitee_token}"}
+
+    # 4. Join project using the token
+    join_res = await client.get("/join", params={"token": token}, headers=invitee_headers)
+    assert join_res.status_code == 200
+
+    # 5. Verify the invitee is now a member of the project
+    info_res = await client.get(f"/project/{test_project.id}/info", headers=invitee_headers)
+    assert info_res.status_code == 200
+    assert info_res.json()["id"] == str(test_project.id)
+
+
+@pytest.mark.asyncio
+async def test_join_project_expired_token(client: AsyncClient, test_project: Project, db_session: AsyncSession):
+    # 1. Create a new user
+    invitee = User(username="expired@example.com", hashed_password=hash_password("password"))
+    db_session.add(invitee)
+    await db_session.commit()
+
+    from app.utils.auth import create_access_token
+    invitee_token = create_access_token(str(invitee.id))
+    invitee_headers = {"Authorization": f"Bearer {invitee_token}"}
+
+    # 2. Generate expired token
+    import jwt
+    from datetime import UTC, datetime, timedelta
+    from app.config import settings
+    expire = datetime.now(UTC) - timedelta(hours=1)
+    payload = {"sub": "invite", "project_id": str(test_project.id), "email": "expired@example.com", "exp": expire}
+    expired_token = jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
+
+    # 3. Try to join
+    response = await client.get("/join", params={"token": expired_token}, headers=invitee_headers)
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Invalid or expired invitation token"

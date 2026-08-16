@@ -16,7 +16,7 @@ async def register(body: RegisterRequest, db: AsyncSession) -> TokenResponse:
     except IntegrityError:
         await db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="Login already taken"
+            status_code=status.HTTP_409_CONFLICT, detail="Username already taken"
         )
 
     await db.refresh(user)

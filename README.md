@@ -34,6 +34,16 @@ Migrations run automatically on startup. Once ready:
 - **API**: http://localhost:8000
 - **Swagger UI**: http://localhost:8000/docs
 
+## Running Tests
+
+The integration tests depend on a test database running on port `5433` (managed by Docker Compose). To start the database container and run the tests, execute:
+
+```bash
+make test
+```
+
+Alternatively, you can run `tox` directly to run testing/linting in isolated virtual environments.
+
 ## Make Commands
 
 | Command | Description |
@@ -43,3 +53,8 @@ Migrations run automatically on startup. Once ready:
 | `make down` | Stop and remove containers |
 | `make logs` | Tail live logs |
 | `make shell` | Open a shell inside the API container |
+| `make test` | Run the pytest test suite (spins up `db_test` container automatically) |
+
+## Limitations & Stub Features
+
+- **Virus Scanner Simulation**: The virus scanner (implemented in `lambda/handler.py`) is a demonstration stub. It randomly clean-marks or quarantines uploaded documents to simulate scanning behavior, and does not perform actual contents scanning. For a real production environment, a service like ClamAV running as a container or an S3 quarantine bucket workflow should be integrated.
