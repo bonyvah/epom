@@ -10,8 +10,6 @@ jobs:
   # 1. LINT JOB
   lint:
     runs-on: ubuntu-latest
-    env:
-      POETRY_VIRTUALENVS_IN_PROJECT: true
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -29,7 +27,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      POETRY_VIRTUALENVS_IN_PROJECT: true
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5433/epom_test
       SECRET_KEY: changemechangemechangemechangeme
       ALGORITHM: HS256
@@ -63,23 +60,24 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install Poetry
-        run: pipx install poetry
-      - name: Cache venv
+        run: pip install poetry
+      - name: Load cached venv
+        id: cached-poetry-dependencies
         uses: actions/cache@v4
         with:
           path: .venv
-          key: test-venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            test-venv-${{ runner.os }}-
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
       - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-root
       - name: Run Tests
-        run: poetry run pytest
+        run: poetry run tox -e py312
 
   # 3. CD (DEPLOY) JOB
   deploy:
     name: Build & Push Docker Image
     needs: [lint, test]
+    # Only run on pushes/merges to the main branch
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     environment: prod
