@@ -4,7 +4,7 @@ from fastapi import APIRouter, UploadFile, status
 
 from app.database import DBSession
 from app.dependencies import CurrentUser, PaginationParamsDep
-from app.schemas.document import (  # , UploadDocumentsResponse
+from app.schemas.document import (
     DocumentResponse,
     DocumentUpdate,
 )
@@ -45,30 +45,3 @@ async def download_file(id: UUID, current_user: CurrentUser, db: DBSession):
 async def delete_document(id: UUID, current_user: CurrentUser, db: DBSession):
     await document_service.delete_document(id, current_user, db)
 
-
-# @router.post(
-#     "/project/{id}/documents",
-#     response_model=UploadDocumentsResponse,
-#     openapi_extra={
-#         "requestBody": {
-#             "content": {
-#                 "multipart/form-data": {
-#                     "schema": {
-#                         "type": "object",
-#                         "required": ["files"],
-#                         "properties": {
-#                             "files": {
-#                                 "type": "array",
-#                                 "items": {"type": "string", "format": "binary"},
-#                                 "description": "Files to upload",
-#                             }
-#                         },
-#                     }
-#                 }
-#             },
-#             "required": True,
-#         }
-#     },
-# )
-# async def upload_project_documents(id: UUID, current_user: CurrentUser, db: DBSession, files: Annotated[List[UploadFile], File(description="Files to upload")]):
-#     return await document_service.upload_documents_to_project(id, files, current_user, db)

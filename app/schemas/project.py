@@ -36,3 +36,8 @@ class ProjectResponse(BaseModel):
 
 class InviteUserRequest(BaseModel):
     user_id: UUID
+
+
+class ShareProjectRequest(BaseModel):
+    email: str
+

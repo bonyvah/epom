@@ -167,7 +167,7 @@ async def test_unauthorized_document_access(client: AsyncClient, test_project: P
 
     # 5. Attempt delete
     res = await client.delete(f"/document/{doc.id}", headers=unauth_headers)
-    assert res.status_code == 404
+    assert res.status_code == 403
 
     # 6. Attempt upload to this project
     files = {"file": ("unauth.txt", b"some bytes", "text/plain")}
@@ -209,3 +209,10 @@ async def test_upload_document_db_failure_cleanup(
         
         # Verify that delete_file was called on the mock to cleanup the S3 object
         assert mock_s3_and_mail["delete_file"].called
+
+
+@pytest.mark.asyncio
+async def test_delete_document_not_found(client: AsyncClient, auth_headers: dict, db_session: AsyncSession):
+    non_existent_id = uuid4()
+    response = await client.delete(f"/document/{non_existent_id}", headers=auth_headers)
+    assert response.status_code == 404

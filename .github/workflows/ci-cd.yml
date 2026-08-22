@@ -26,6 +26,7 @@ jobs:
   # 2. TEST JOB
   test:
     runs-on: ubuntu-latest
+    # these are fake envs
     env:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5433/epom_test
       SECRET_KEY: changemechangemechangemechangeme

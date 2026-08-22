@@ -106,7 +106,7 @@ async def test_grant_access_already_member(client: AsyncClient, auth_headers: di
 @pytest.mark.asyncio
 async def test_send_join_link_success(client: AsyncClient, auth_headers: dict, test_project: Project, mock_s3_and_mail: dict):
     email = "new_member@example.com"
-    response = await client.post(f"/project/{test_project.id}/share", params={"email": email}, headers=auth_headers)
+    response = await client.post(f"/project/{test_project.id}/share", json={"email": email}, headers=auth_headers)
     assert response.status_code == 202
     assert mock_s3_and_mail["send_mail"].called
 
@@ -115,7 +115,7 @@ async def test_send_join_link_success(client: AsyncClient, auth_headers: dict, t
 async def test_join_project_flow(client: AsyncClient, auth_headers: dict, test_project: Project, mock_s3_and_mail: dict, db_session: AsyncSession):
     # 1. Invite a member
     email = "invitee@example.com"
-    response = await client.post(f"/project/{test_project.id}/share", params={"email": email}, headers=auth_headers)
+    response = await client.post(f"/project/{test_project.id}/share", json={"email": email}, headers=auth_headers)
     assert response.status_code == 202
 
     # 2. Extract invite link and token from mock mail call

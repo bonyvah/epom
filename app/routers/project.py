@@ -9,6 +9,7 @@ from app.schemas.project import (
     ProjectCreate,
     ProjectResponse,
     ProjectUpdate,
+    ShareProjectRequest,
 )
 from app.services import project as project_service
 
@@ -57,9 +58,9 @@ async def grant_access_to_project(
 
 @router.post("/project/{id}/share", status_code=status.HTTP_202_ACCEPTED)
 async def send_join_link(
-    id: UUID, email: str, current_user: CurrentUser, db: DBSession
+    id: UUID, body: ShareProjectRequest, current_user: CurrentUser, db: DBSession
 ):
-    await project_service.send_join_link(id, email, current_user, db)
+    await project_service.send_join_link(id, body.email, current_user, db)
 
 
 @router.get("/join")

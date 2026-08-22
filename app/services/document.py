@@ -164,12 +164,19 @@ async def update_document(
 
 
 async def delete_document(id: UUID, current_user: User, db: AsyncSession):
-
-    document = await _get_current_user_document(id, current_user, db)
+    result = await db.execute(select(Document).where(Document.id == id))
+    document = result.scalar_one_or_none()
 
     if not document:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
+        )
+
+    project = await _get_current_user_project(document.project_id, current_user, db)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is not a member of the project",
         )
 
     try:
@@ -181,71 +188,3 @@ async def delete_document(id: UUID, current_user: User, db: AsyncSession):
         )
     await db.delete(document)
     await db.commit()
-
-
-# async def upload_documents_to_project(
-#     project_id: UUID,
-#     files: list[UploadFile],
-#     current_user: User,
-#     db: AsyncSession,
-# ) -> dict:
-#     #1)
-#     project = await _get_current_user_project(project_id, current_user, db)
-
-#     if not project:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
-#         )
-
-#     doc_limit_bytes = project.document_size_limit_mb * 1024 * 1024
-#     project_limit_bytes = project.project_size_limit_gb * 1024 * 1024 * 1024
-
-#     total_size_query = await db.execute(
-#         select(func.sum(Document.size_bytes)).where(Document.project_id == project_id)
-#     )
-#     current_total_size = total_size_query.scalar() or 0
-
-#     docs = []
-#     uploaded_keys = []
-#     for file in files:
-#         contents = await file.read()
-
-#         if len(contents) > doc_limit_bytes:
-#             raise HTTPException(
-#                 status_code=status.HTTP_413_CONTENT_TOO_LARGE,
-#                 detail=f"File {file.filename} exceeds project document limit of {project.document_size_limit_mb}MB",
-#             )
-
-#         document_id = uuid4()
-#         key = f"{document_id}/{file.filename}"
-#         content_type = file.content_type or "application/octet-stream"
-
-#         try:
-#             await upload_file(key, contents, content_type)
-#             uploaded_keys.append(key)
-#         except Exception:
-#             for key in uploaded_keys:
-#                 await delete_file(key)
-#             raise HTTPException(
-#                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-#                 detail=f"Failed to upload {file.filename}",
-#             )
-
-#         document = Document(
-#             id=document_id,
-#             project_id=project_id,
-#             name=file.filename,
-#             s3_key=key,
-#             size_bytes=len(contents),
-#             content_type=content_type,
-#             uploaded_by=current_user.id,
-#         )
-#         docs.append(document)
-#         db.add(document)
-
-#     await db.commit()
-
-#     for d in docs:
-#         await db.refresh(d)
-
-#     return docs
